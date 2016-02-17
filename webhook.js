@@ -98,13 +98,13 @@ Webhook.prototype.check_branch = function(ref, branch) {
 	return true;
 };
 
-Webhook.prototype.rollback = function(cwd) {
-	console.log('# Rollback to', commit);
-	return helpers.promisify(cwd, 'git checkout' + commit)
+Webhook.prototype.rollback = function(repo) {
+	console.log('# Rollback to', repo.commit);
+	return helpers.promisify(repo.cwd, 'git checkout' + repo.commit)
 		.then(function() {
 			if(npm) {
 				console.log('# Run npm i');
-				return helpers.promisify(cwd, 'npm i');
+				return helpers.promisify(repo.cwd, 'npm i');
 			}
 		});
 };
@@ -213,7 +213,7 @@ Webhook.prototype.handler = function(req, res) {
 
 			if(_this.check_branch(body.ref, repo.branch)) {
 				// Checkout new branch
-				return _this.checkout(body.head_commit, repo)
+				return _this.checkout(body.head_commit, repo.name)
 					.then(function(installed) {
 						// save if npm i has been run
 						npm = installed;
@@ -235,7 +235,7 @@ Webhook.prototype.handler = function(req, res) {
 					})
 					.catch(function(e) {
 						sendError(e);
-						_this.rollback(repo.cwd);
+						_this.rollback(repo);
 					});
 			} else {
 				// Answer - wrong branch
@@ -244,7 +244,7 @@ Webhook.prototype.handler = function(req, res) {
 
 		} catch(e) {
 			if(repo) {
-				_this.rollback(repo.cwd);
+				_this.rollback(repo);
 			}
 
 			sendError(e);

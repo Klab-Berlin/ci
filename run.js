@@ -41,9 +41,7 @@ node.stderr.on('data', logToRedis);
 process.on('message', function(message) {
 	if(message === 'exit') {
 		logToRedis('--------------- STOPPING PROCESS');
-			.then(function() {
-				node.kill();
-			});
+		node.kill();
 	}
 });
 

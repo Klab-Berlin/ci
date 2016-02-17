@@ -38,17 +38,17 @@ Webhook.prototype.init = function() {
 };
 
 Webhook.prototype.start = function(name) {
-	var repo = this.repos[name];
+	var repo = this.getRepository(name);
 	if(!repo) {
 		return;
 	}
 
 	if(repo.command) {
 		console.log('# Starting', name);
-		repo.process = helpers.spawn(
+		repo.process = helpers.fork(
 			process.cwd(),
-			'node',
-			['run.js', repo.name, repo.cwd, repo.command]
+			'run.js',
+			[repo.name, repo.cwd, repo.command]
 		);
 	}
 };
@@ -67,7 +67,7 @@ Webhook.prototype.stop = function(name) {
 };
 
 Webhook.prototype.restart = function(name) {
-	var repo = this.getRepository[name];
+	var repo = this.getRepository(name);
 	if(!repo) {
 		return q(true);
 	}

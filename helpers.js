@@ -19,6 +19,12 @@ var spawn = function(cwd, command, args, callback) {
 	return child_process.spawn(command, args, {cwd: cwd}, callback);
 };
 
+var fork = function(cwd, command, args) {
+	console.log('# Forking [at '+ cwd +']', command, args);
+
+	return child_process.fork(command, args, {cwd: cwd});
+};
+
 var promisify = function(cwd, command) {
 	var a = q.defer();
  	run(cwd, command, function(error, out, err) {
@@ -34,5 +40,6 @@ var promisify = function(cwd, command) {
 module.exports = {
 	promisify: promisify,
 	run: run,
-	spawn: spawn
+	spawn: spawn,
+	fork: fork
 };

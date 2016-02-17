@@ -38,6 +38,15 @@ var logToRedis = function(data) {
 node.stdout.on('data', logToRedis);
 node.stderr.on('data', logToRedis);
 
-process.on('exit', function() {
-	node.kill();
+process.on('message', function(message) {
+	if(message === 'exit') {
+		logToRedis('--------------- STOPPING PROCESS');
+			.then(function() {
+				node.kill();
+			});
+	}
+});
+
+node.on('exit', function() {
+	process.exit(0);
 });

@@ -44,7 +44,7 @@ Webhook.prototype.start = function(name) {
 	}
 
 	if(repo.command) {
-		console.log('# Start', name);
+		console.log('# Starting', name);
 		repo.process = helpers.spawn(
 			process.cwd(),
 			'node',
@@ -59,9 +59,10 @@ Webhook.prototype.stop = function(name) {
 		return q(true);
 	}
 
+	console.log('# Stopping', name);
 	var a = q.defer();
-	repo.process.on('close', a.resolve.bind(a));
-	repo.process.kill();
+	repo.process.on('exit', a.resolve.bind(a));
+	repo.process.send('exit');
 	return a.promise;
 };
 
@@ -71,6 +72,7 @@ Webhook.prototype.restart = function(name) {
 		return q(true);
 	}
 
+	console.log('# Restart', name);
 	var _this = this;
 	return this
 		.stop(name)

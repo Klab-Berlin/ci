@@ -44,6 +44,7 @@ Webhook.prototype.start = function(name) {
 	}
 
 	if(repo.command) {
+		console.log('# Start', name);
 		repo.process = helpers.spawn(
 			process.cwd(),
 			'node',
@@ -61,7 +62,9 @@ Webhook.prototype.restart = function(name) {
 		return;
 	}
 
+	console.log('# Restart', name);
 	if(repo.process) {
+		console.log('# Kill', name);
 		repo.process.kill();
 	}
 

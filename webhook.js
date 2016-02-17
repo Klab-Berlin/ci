@@ -68,7 +68,7 @@ Webhook.prototype.restart = function(name) {
 		repo.process.kill();
 	}
 
-	this.start(repo);
+	this.start(name);
 };
 
 Webhook.prototype.stopAll = function() {

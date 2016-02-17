@@ -161,6 +161,7 @@ Webhook.prototype.test = function(cwd) {
 
 Webhook.prototype.handler = function(req, res) {
 	console.log('\n# Handling Request at ' + (new Date()));
+	var _this = this;
 	var npm = false;
 	var headers = req.headers;
 	var repo;
@@ -190,7 +191,7 @@ Webhook.prototype.handler = function(req, res) {
 			var body = JSON.parse(data);
 
 			// Get the repository for CI/CD
-			repo = this.getRepository(body.repository.name);
+			repo = _this.getRepository(body.repository.name);
 
 			// Return if no repo found
 			if(!repo) {
@@ -198,21 +199,21 @@ Webhook.prototype.handler = function(req, res) {
 			}
 
 			// Check request
-			this.check(headers['x-hub-signature'], data, repo.secret);
+			_this.check(headers['x-hub-signature'], data, repo.secret);
 
-			if(check_branch(body.ref, repo.branch)) {
+			if(_this.check_branch(body.ref, repo.branch)) {
 				// Checkout new branch
-				return checkout(body.head_commit, repo)
+				return _this.checkout(body.head_commit, repo)
 					.then(function(installed) {
 						// save if npm i has been run
 						npm = installed;
 
 						// Execute Tests
-						return test(repo.cwd);
+						return _this.test(repo.cwd);
 					})
 					.then(function() {
 						// Deploy Version
-						return deploy(repo.name);
+						return _this.deploy(repo.name);
 					})
 					.then(function() {
 						// Send Answer
@@ -224,7 +225,7 @@ Webhook.prototype.handler = function(req, res) {
 					})
 					.catch(function(e) {
 						sendError(e);
-						rollback(repo.cwd);
+						_this.rollback(repo.cwd);
 					});
 			} else {
 				// Answer - wrong branch
@@ -233,12 +234,12 @@ Webhook.prototype.handler = function(req, res) {
 
 		} catch(e) {
 			if(repo) {
-				rollback(repo.cwd);
+				_this.rollback(repo.cwd);
 			}
 
 			sendError(e);
 		}
-	}.bind(this));
+	});
 };
 
 module.exports = Webhook;

@@ -37,3 +37,7 @@ var logToRedis = function(data) {
 
 node.stdout.on('data', logToRedis);
 node.stderr.on('data', logToRedis);
+
+process.on('exit', function() {
+	node.kill();
+});

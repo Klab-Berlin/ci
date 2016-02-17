@@ -16,3 +16,7 @@ webhook.init()
 		console.error(e.stack);
 		process.exit(1);
 	});
+
+process.on('exit', function() {
+	webhook.stopAll();
+});

@@ -68,6 +68,16 @@ Webhook.prototype.restart = function(name) {
 	this.start(repo);
 };
 
+Webhook.prototype.stopAll = function() {
+	var _this = this;
+	Object.keys(this.repos).forEach(function(name) {
+		var repo = _this.repos[name];
+		if(repo.process) {
+			repo.process.kill();
+		}
+	});
+};
+
 Webhook.prototype.check = function(key, body, secret) {
 	var gen = crypto.createHmac('sha1', secret);
 	gen.update(body);

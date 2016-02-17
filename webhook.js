@@ -48,27 +48,35 @@ Webhook.prototype.start = function(name) {
 		repo.process = helpers.spawn(
 			process.cwd(),
 			'node',
-			['run.js', repo.name, repo.cwd, repo.command],
-			function(err, out, eout) {
-				console.log(err, out, eout);
-			}
+			['run.js', repo.name, repo.cwd, repo.command]
 		);
 	}
 };
 
+Webhook.prototype.stop = function(name) {
+	var repo = this.getRepository(name);
+	if(!repo || !repo.process) {
+		return q(true);
+	}
+
+	var a = q.defer();
+	repo.process.on('close', a.resolve.bind(a));
+	repo.process.kill();
+	return a.promise;
+};
+
 Webhook.prototype.restart = function(name) {
-	var repo = this.repos[name];
+	var repo = this.getRepository[name];
 	if(!repo) {
-		return;
+		return q(true);
 	}
 
-	console.log('# Restart', name);
-	if(repo.process) {
-		console.log('# Kill', name);
-		repo.process.kill();
-	}
-
-	this.start(name);
+	var _this = this;
+	return this
+		.stop(name)
+		.then(function() {
+			return _this.start(name);
+		});
 };
 
 Webhook.prototype.stopAll = function() {
@@ -120,7 +128,7 @@ Webhook.prototype.deploy = function(name) {
 		repo.deploy(this);
 	}
 
-	this.restart(name);
+	return this.restart(name);
 };
 
 Webhook.prototype.checkout = function(commit, name) {

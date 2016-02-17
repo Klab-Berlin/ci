@@ -240,3 +240,5 @@ Webhook.prototype.handler = function(req, res) {
 		}
 	}.bind(this));
 };
+
+module.exports = Webhook;

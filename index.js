@@ -6,7 +6,7 @@ var config = require('./config');
 var webhook = new Webhook(config);
 webhook.init()
 	.then(function() {
-		https.createServer(handler)
+		https.createServer(webhook.handler.bind(webhook))
 			.listen(8445, '0.0.0.0', function() {
 				console.log('listening on 8445');
 			});

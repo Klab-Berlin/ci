@@ -27,7 +27,7 @@ Webhook.prototype.init = function() {
 	}, this);
 
 	// Get all repos current commit
-	return q.all(Object.keys(repos).map(function(name) {
+	return q.all(Object.keys(this.repos).map(function(name) {
 		var repo = _this.repos[name];
 		return helpers.promisify(repo.cwd, 'git rev-parse HEAD')
 			.then(function(c) {
